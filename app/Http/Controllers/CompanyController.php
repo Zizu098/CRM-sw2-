@@ -66,4 +66,77 @@ class CompanyController extends Controller
         return redirect("displayCompanies");
     }
 
-   
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        $company = $this->todo->getById($id);
+        return view("Company.detail",compact('company'));
+
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        $company = Company::findOrfail($id);
+        return view("Company.update",compact('company'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+
+        request()->validate([
+        'name' => 'required',
+        ]);
+
+        $updateCompany = Company::findOrfail($id);
+        $updateCompany->name = $request->input('name');
+        $updateCompany->email = $request->input('email');
+        $updateCompany->website = $request->input('website');
+
+        $updateCompany->updated_at=$this->adapter->now();
+        $updateCompany->save();
+        return redirect("displayCompanies");
+
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        $company = Company::findOrfail($id);
+        $company->delete();
+        return redirect("displayCompanies");
+    }
+    
+     public function showSearch()
+    {
+        return view('Company.showSearch');
+    }
+    public function search(Request $request)
+    {
+        $companys = Company::where('name',$request->name)->get();
+        return view('Company.search',compact('companys'));
+    }
+
+}
